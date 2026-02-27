@@ -19,9 +19,9 @@ if(isset($_POST['user_id'])){
     } 
     else {
 
-        
+        $accesstoken=getTokenToSendAPI($user_id);
 
-            respondOK(["user_id"=>$user_id], "Logout successful");
+            respondOK(["access_token"=>$accesstoken], "Logout successful");
 
     
 
