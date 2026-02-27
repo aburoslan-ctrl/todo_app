@@ -81,10 +81,10 @@ if (isset($_POST['user_id'], $_POST['fname'], $_POST['lname'], $_POST['password'
         $getUser->bind_param("i", $user_id);
         $getUser->execute();
         $userDetails = $getUser->get_result()->fetch_assoc();
+            $user_id=$userDetails["user_id"];
+            $accesstoken=getTokenToSendAPI($user_id);
 
-
-
-        respondOK($userDetails, "Profile updated successfully");
+        respondOK($accesstoken, "Profile updated successfully");
     } else {
         respondBadRequest("No changes made or update failed.");
     }

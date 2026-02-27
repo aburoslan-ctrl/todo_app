@@ -60,8 +60,9 @@ if (isset($_POST['user_id'], $_POST['old_password'], $_POST['new_password'])) {
 
     if ($updatePassword->affected_rows > 0) {
 
+    $accesstoken=getTokenToSendAPI($user_id);
         respondOK(
-            ["user_id"=> $user_id],
+            ["access_token"=> $accesstoken],
             "Password updated successfully"
         );
 
