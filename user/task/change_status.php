@@ -59,7 +59,8 @@ if (isset($_POST['task_id'], $_POST['status'])) {
     $updateStatus->execute();
 
     if ($updateStatus->affected_rows > 0) {
-        respondOK(["task_id" => $task_id], "Task status updated successfully");
+         $accesstoken=getTokenToSendAPI($task_id);
+        respondOK(["access_token" => $accesstoken], "Task status updated successfully");
     } else {
         respondBadRequest("Failed to update task status.");
     }

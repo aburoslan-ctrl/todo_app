@@ -78,7 +78,8 @@ if (isset($_POST['what_to_do'], $_POST['user_id'], $_POST['start_time'], $_POST[
     $insertTask->execute();
 
     if ($insertTask->affected_rows > 0) {
-        respondOK(["user_id" => $user_id], "Task added successfully");
+    $accesstoken=getTokenToSendAPI($user_id);
+        respondOK(["access_token" => $accesstoken], "Task added successfully");
     } else {
         respondBadRequest("Failed to add task.");
     }

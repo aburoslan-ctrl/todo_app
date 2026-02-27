@@ -44,7 +44,8 @@ if (isset($_POST['task_id'])) {
     $deleteTask->execute();
 
     if ($deleteTask->affected_rows > 0) {
-        respondOK(["task_id" => $task_id], "Task deleted successfully");
+        $accesstoken=getTokenToSendAPI($task_id);
+        respondOK(["access_token" => $accesstoken], "Task deleted successfully");
     } else {
         respondBadRequest("Failed to delete task.");
     }

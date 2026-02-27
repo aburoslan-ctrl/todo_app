@@ -67,7 +67,7 @@ if (isset($_POST['task_id'], $_POST['what_to_do'], $_POST['user_id'], $_POST['st
 
     //  Check if user exists
     $checkUser = $connect->prepare("SELECT task_id FROM tasks WHERE task_id = ?");
-    $checkUser->bind_param("i", $user_id);
+    $checkUser->bind_param("i", $task_id);
     $checkUser->execute();
     $result = $checkUser->get_result();
 
@@ -77,8 +77,7 @@ if (isset($_POST['task_id'], $_POST['what_to_do'], $_POST['user_id'], $_POST['st
     }
 
     // UPDATE TASK
-    $updateTask = $connect->prepare("
-        UPDATE tasks 
+    $updateTask = $connect->prepare("UPDATE tasks 
         SET what_to_do = ?, 
             user_id = ?, 
             start_time = ?, 
@@ -91,7 +90,8 @@ if (isset($_POST['task_id'], $_POST['what_to_do'], $_POST['user_id'], $_POST['st
     $updateTask->execute();
 
     if ($updateTask->affected_rows > 0) {
-        respondOK(["task_id" => $task_id], "Task updated successfully");
+        $accesstoken=getTokenToSendAPI($task_id);
+        respondOK(["access_token" => $accesstoken], "Task updated successfully");
     } else {
         respondBadRequest("No changes made or update failed.");
     }
