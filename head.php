@@ -8,7 +8,7 @@ Header("Cache-Control: $cache");
 header("Access-Control-Max-Age: 3600");//3600 seconds
 // 1)private,max-age=60 (browser is only allowed to cache) 2)no-store(public),max-age=60 (all intermidiary can cache, not browser alone)  3)no-cache (no ceaching at all)
 
-Include JWT library
+//Include JWT library
 require_once(__DIR__ . "/../vendor/autoload.php");
 
 include "functions.php";
