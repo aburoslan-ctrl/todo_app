@@ -18,7 +18,8 @@ if(isset($_POST['user_id']) && isset($_POST['password'])){
         $getdataemail->execute();
         $getresultemail = $getdataemail->get_result();
         if( $getresultemail->num_rows> 0){
-          respondOK(["user_id"=>$user_id],"Login successful");
+            $accesstoken=getTokenToSendAPI($user_id);
+          respondOK(["access_token"=>$accesstoken],"Login successful");
         }else{ respondBadRequest(" user not found"); } 
  }
 }else{
