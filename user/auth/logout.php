@@ -3,27 +3,13 @@ $method="POST";
 $cache="no-cache";
 include "../../head.php";
 
-// start session
-session_start();
+$tokenUser = ValidateAPITokenSentIN();
+$user_id = $tokenUser->usertoken;
 
-if(isset($_POST['user_id'])){
+if (!isset($user_id) || input_is_invalid($user_id) || !is_numeric($user_id)) {
+    respondUnauthorized();
+    exit;
+}
 
-    $user_id = cleanme($_POST['user_id']);
-
-    // validation
-    if(input_is_invalid($user_id)){
-        respondBadRequest("User ID is required");
-    } 
-    else if(!is_numeric($user_id)){
-        respondBadRequest("User ID must be numeric");
-    } 
-    else {
-
-        $accesstoken=getTokenToSendAPI($user_id);
-
-            respondOK(["access_token"=>$accesstoken], "Logout successful");
-
-    
-
-}}
+respondOK([], "Logout successful");
 ?>

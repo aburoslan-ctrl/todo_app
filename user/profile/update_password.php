@@ -1,27 +1,26 @@
 <?php
-
 $method="POST";
 $cache="no-cache";
 include "../../head.php";
 
-if (isset($_POST['user_id'], $_POST['old_password'], $_POST['new_password'])) {
+$tokenUser = ValidateAPITokenSentIN();
+$user_id = $tokenUser->usertoken;
 
-    $user_id      = cleanme($_POST['user_id']);
+if (!isset($user_id) || input_is_invalid($user_id) || !is_numeric($user_id)) {
+    respondUnauthorized();
+    exit;
+}
+
+if (isset($_POST['old_password'], $_POST['new_password'])) {
+
     $old_password = cleanme($_POST['old_password']);
     $new_password = cleanme($_POST['new_password']);
 
-    // Validation
     if (
-        input_is_invalid($user_id) ||
         input_is_invalid($old_password) ||
         input_is_invalid($new_password)
     ) {
         respondBadRequest("All fields are required.");
-        exit;
-    }
-
-    else if (!is_numeric($user_id)) {
-        respondBadRequest("User ID must be numeric.");
         exit;
     }
 
@@ -30,7 +29,6 @@ if (isset($_POST['user_id'], $_POST['old_password'], $_POST['new_password'])) {
         exit;
     }
 
-    // Check if user exists and verify old password
     $checkUser = $connect->prepare("SELECT password FROM users WHERE user_id = ?");
     $checkUser->bind_param("i", $user_id);
     $checkUser->execute();
@@ -43,29 +41,28 @@ if (isset($_POST['user_id'], $_POST['old_password'], $_POST['new_password'])) {
 
     $user = $result->fetch_assoc();
 
-    // Compare old password (plain text - same as your system style)
-    if ($user['password'] !== $old_password) {
+    $stored = $user['password'];
+    $oldOk = password_verify($old_password, $stored) || hash_equals((string)$stored, (string)$old_password);
+    if (!$oldOk) {
         respondBadRequest("Old password is incorrect.");
         exit;
     }
 
-    // Update password
-    $updatePassword = $connect->prepare("UPDATE users 
+    $hashedNewPassword = password_hash($new_password, PASSWORD_DEFAULT);
+    $updatePassword = $connect->prepare("UPDATE users
         SET password = ?
         WHERE user_id = ?
     ");
 
-    $updatePassword->bind_param("si", $new_password, $user_id);
+    $updatePassword->bind_param("si", $hashedNewPassword, $user_id);
     $updatePassword->execute();
 
     if ($updatePassword->affected_rows > 0) {
-
-    $accesstoken=getTokenToSendAPI($user_id);
+        $accesstoken = getTokenToSendAPI($user_id);
         respondOK(
-            ["access_token"=> $accesstoken],
+            ["access_token" => $accesstoken],
             "Password updated successfully"
         );
-
     } else {
         respondBadRequest("Password update failed.");
     }
@@ -73,5 +70,4 @@ if (isset($_POST['user_id'], $_POST['old_password'], $_POST['new_password'])) {
 } else {
     respondBadRequest("Invalid request. All fields are required.");
 }
-
 ?>
